@@ -1,32 +1,45 @@
 package com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.today
 
+import android.animation.LayoutTransition
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import androidx.activity.viewModels
+import android.view.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.scientisthamsterssofiandjohn.weatherapp.R
 import com.scientisthamsterssofiandjohn.weatherapp.data.Resource
-import com.scientisthamsterssofiandjohn.weatherapp.databinding.ActivityWeatherBinding
 import com.scientisthamsterssofiandjohn.weatherapp.databinding.FragmentTodayBinding
 import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResponse
+import com.scientisthamsterssofiandjohn.weatherapp.view.WeatherActivity
 import com.scientisthamsterssofiandjohn.weatherapp.view.viewmodel.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.scopes.FragmentScoped
 
 @AndroidEntryPoint
 class TodayFragment : Fragment(R.layout.fragment_today) {
 
     private lateinit var binding: FragmentTodayBinding
+
     private val viewModel: WeatherViewModel by viewModels()
+
+    private lateinit var searchView: SearchView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentTodayBinding.bind(view)
+        setHasOptionsMenu(true)
 
-        viewModel.getCurrentWeather("Kiev")
+        (activity as WeatherActivity).setSupportActionBar(binding.toolbar)
+        (activity as WeatherActivity).supportActionBar!!.setDisplayShowTitleEnabled(false)
+
+        viewModel.getCurrentWeather("New York")
 
         viewModel.weatherResponse.observe(viewLifecycleOwner, Observer {
             updateUI(it)
@@ -65,5 +78,50 @@ class TodayFragment : Fragment(R.layout.fragment_today) {
 
     private fun hideProgress() {
         binding.progressBar.visibility = View.GONE
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        inflater.inflate(R.menu.search_menu, menu)
+
+        val searchManager =
+            requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+
+        val menuItemSearch = menu.findItem(R.id.action_search)
+        searchView = menuItemSearch.actionView as SearchView
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+        personalizeSearchView()
+        initSearchViewListener()
+    }
+
+    private fun initSearchViewListener() {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                this.callSearch(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                return false
+            }
+
+            private fun callSearch(query: String) {
+                viewModel.getCurrentWeather(query)
+            }
+        })
+    }
+
+    private fun personalizeSearchView() {
+        val txtSearch =
+            searchView.findViewById<View>(androidx.appcompat.R.id.search_src_text) as EditText
+        txtSearch.hint = getString(R.string.search)
+        txtSearch.setHintTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        txtSearch.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+
+        val closeButton = searchView.findViewById<ImageView>(R.id.search_close_btn)
+        closeButton.setImageResource(R.drawable.ic_close)
+        
+        val searchBar = searchView.findViewById(R.id.search_bar) as LinearLayout
+        searchBar.layoutTransition = LayoutTransition()
     }
 }
