@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/weather_nav_graph"
+    app:startDestination="@id/todayFragment">
+
+    <fragment
+        android:id="@+id/weekFragment"
+        android:name="com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.week.WeekFragment"
+        android:label="fragment_week"
+        tools:layout="@layout/fragment_week" >
+        <action
+            android:id="@+id/action_weekFragment_to_todayFragment"
+            app:destination="@id/todayFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/todayFragment"
+        android:name="com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.today.TodayFragment"
+        android:label="fragment_today"
+        tools:layout="@layout/fragment_today" />
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.map.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
+</navigation>
