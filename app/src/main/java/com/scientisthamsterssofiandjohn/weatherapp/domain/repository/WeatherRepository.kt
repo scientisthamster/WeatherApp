@@ -2,7 +2,7 @@ package com.scientisthamsterssofiandjohn.weatherapp.domain.repository
 
 import com.scientisthamsterssofiandjohn.weatherapp.data.local.WeatherDao
 import com.scientisthamsterssofiandjohn.weatherapp.data.remote.WeatherApi
-import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResult
+import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherEntity
 import javax.inject.Inject
 
 class WeatherRepository @Inject constructor(
@@ -13,9 +13,9 @@ class WeatherRepository @Inject constructor(
 
     suspend fun getForecastWeather(city: String) = weatherApi.getForecastWeather(city = city)
 
-    suspend fun insertWeather(weatherResult: WeatherResult) = weatherDao.insertWeather(weatherResult)
+    suspend fun insertWeather(weather: WeatherEntity) = weatherDao.insertWeather(weather)
 
-    suspend fun deleteWeather(weatherResult: WeatherResult) = weatherDao.deleteWeather(weatherResult)
+    suspend fun deleteWeather(weather: WeatherEntity) = weatherDao.deleteWeather(weather)
 
     fun getSavedWeather() = weatherDao.getWeather()
 }

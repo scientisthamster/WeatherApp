@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import com.scientisthamsterssofiandjohn.weatherapp.R
 import com.scientisthamsterssofiandjohn.weatherapp.data.Resource
 import com.scientisthamsterssofiandjohn.weatherapp.databinding.FragmentTodayBinding
+import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherEntity
 import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResponse
 import com.scientisthamsterssofiandjohn.weatherapp.utils.Constants.Companion.PREF_CITY
 import com.scientisthamsterssofiandjohn.weatherapp.view.WeatherActivity
@@ -55,7 +56,38 @@ class TodayFragment : Fragment(R.layout.fragment_today) {
             updateUI(it)
             weatherResponse = it.data
         })
+
+        viewModel.getSavedWeather()
+
+        viewModel.savedWeather.observe(viewLifecycleOwner, Observer { weatherList ->
+            if (weatherList != null) {
+                updateCachedUI(weatherList)
+            } else {
+                Log.e("TAG", "fignya: ", )
+            }
+        })
     }
+
+    private fun updateCachedUI(weatherList: List<WeatherEntity>) {
+        binding.tvCityName.text = weatherList[0].cityName
+        binding.tvDegree.text = weatherList[0].temp.toString()
+        binding.tvWet.text = weatherList[0].wet.toString() + "%"
+        binding.tvClouds.text = weatherList[0].clouds.toString() + "%"
+        binding.tvWindSpeed.text =
+            getString(R.string.speed, weatherList[0].windSpeed.toString())
+        binding.tvMaxTemp.text =
+            getString(
+                R.string.celsius,
+                weatherList[0].maxTemp.toString()
+            )
+        binding.tvMinTemp.text =
+            getString(
+                R.string.celsius,
+                weatherList[0].minTemp.toString()
+            )
+        binding.tvToolbarTitle.text = weatherList[0].cityName
+    }
+
 
     private fun updateUI(weatherResponse: Resource<WeatherResponse>) {
         when (weatherResponse) {

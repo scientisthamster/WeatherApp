@@ -6,11 +6,6 @@
     app:startDestination="@id/todayFragment">
 
     <fragment
-        android:id="@+id/mapFragment"
-        android:name="com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.map.MapFragment"
-        android:label="fragment_map"
-        tools:layout="@layout/fragment_map" />
-    <fragment
         android:id="@+id/weekFragment"
         android:name="com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.week.WeekFragment"
         android:label="fragment_week"
@@ -24,4 +19,9 @@
         android:name="com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.today.TodayFragment"
         android:label="fragment_today"
         tools:layout="@layout/fragment_today" />
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.map.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
 </navigation>

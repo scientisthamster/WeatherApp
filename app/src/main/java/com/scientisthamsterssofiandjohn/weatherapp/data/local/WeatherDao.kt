@@ -2,17 +2,17 @@ package com.scientisthamsterssofiandjohn.weatherapp.data.local
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResult
+import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherEntity
 
 @Dao
 interface WeatherDao {
 
     @Query("SELECT * FROM WeatherLocal")
-    fun getWeather(): LiveData<List<WeatherResult>>
+    fun getWeather(): LiveData<List<WeatherEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWeather(weatherResult: WeatherResult)
+    suspend fun insertWeather(weather: WeatherEntity)
 
     @Delete
-    suspend fun deleteWeather(weatherResult: WeatherResult)
+    suspend fun deleteWeather(weather: WeatherEntity)
 }

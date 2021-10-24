@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scientisthamsterssofiandjohn.weatherapp.data.Resource
 import com.scientisthamsterssofiandjohn.weatherapp.domain.model.ForecastResponse
+import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherEntity
 import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResponse
-import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResult
 import com.scientisthamsterssofiandjohn.weatherapp.domain.repository.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -29,15 +29,18 @@ class WeatherViewModel @Inject constructor(
     val forecastResponse: LiveData<Resource<ForecastResponse>>
         get() = _forecastResponse
 
-    private val _savedWeather: MutableLiveData<List<WeatherResult>> = MutableLiveData()
+    private val _savedWeather: MutableLiveData<List<WeatherEntity>> = MutableLiveData()
 
-    val savedWeather: LiveData<List<WeatherResult>>
+    val savedWeather: LiveData<List<WeatherEntity>>
         get() = _savedWeather
 
     fun getCurrentWeather(city: String) = viewModelScope.launch {
         _weatherResponse.postValue(Resource.Loading())
         weatherRepository.getCurrentWeather(city = city).let { weatherResponse ->
             if (weatherResponse.isSuccessful) {
+                if (weatherResponse.body() != null) {
+                    insertWeather(weatherResponse.body()!!)
+                }
                 _weatherResponse.postValue(Resource.Success(weatherResponse.body()!!))
             } else {
                 _weatherResponse.postValue(
@@ -61,6 +64,24 @@ class WeatherViewModel @Inject constructor(
                     )
                 )
             }
+        }
+    }
+
+    private suspend fun insertWeather(weatherResponse: WeatherResponse) {
+        val weatherEntity = WeatherEntity()
+        weatherEntity.maxTemp = weatherResponse.main.temp_max
+        weatherEntity.minTemp = weatherResponse.main.temp_min
+        weatherEntity.temp = weatherResponse.main.temp
+        weatherEntity.cityName = weatherResponse.name
+        weatherEntity.clouds = weatherResponse.clouds.all
+        weatherEntity.windSpeed = weatherResponse.wind.speed
+        weatherEntity.wet = weatherResponse.main.humidity
+        weatherRepository.insertWeather(weatherEntity)
+    }
+
+    fun getSavedWeather() = viewModelScope.launch {
+        weatherRepository.getSavedWeather().let { weather ->
+            _savedWeather.postValue(weather.value)
         }
     }
 }
