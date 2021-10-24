@@ -8,7 +8,7 @@ import com.scientisthamsterssofiandjohn.weatherapp.domain.model.ForecastResponse
 import com.scientisthamsterssofiandjohn.weatherapp.domain.model.ListItem
 import com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.week.viewholder.WeekViewHolder
 
-class WeatherListAdapter() :
+class WeatherListAdapter(private val listener: weatherInteractionListener) :
     RecyclerView.Adapter<WeekViewHolder>() {
 
     private var weatherList: List<ListItem> = listOf()
@@ -24,7 +24,7 @@ class WeatherListAdapter() :
 
     override fun onBindViewHolder(holder: WeekViewHolder, position: Int) {
         val weather = weatherList[position]
-        holder.bind(weather)
+        holder.bind(weather, listener)
     }
 
     override fun getItemCount(): Int = weatherList.size

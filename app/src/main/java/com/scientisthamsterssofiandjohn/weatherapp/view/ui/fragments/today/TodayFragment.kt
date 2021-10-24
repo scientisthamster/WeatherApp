@@ -3,6 +3,7 @@ package com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.today
 import android.animation.LayoutTransition
 import android.app.SearchManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -18,6 +19,7 @@ import com.scientisthamsterssofiandjohn.weatherapp.R
 import com.scientisthamsterssofiandjohn.weatherapp.data.Resource
 import com.scientisthamsterssofiandjohn.weatherapp.databinding.FragmentTodayBinding
 import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResponse
+import com.scientisthamsterssofiandjohn.weatherapp.utils.Constants.Companion.PREF_CITY
 import com.scientisthamsterssofiandjohn.weatherapp.view.WeatherActivity
 import com.scientisthamsterssofiandjohn.weatherapp.view.viewmodel.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +33,10 @@ class TodayFragment : Fragment(R.layout.fragment_today) {
 
     private lateinit var searchView: SearchView
 
+    private lateinit var sharedPreferences: SharedPreferences
+
+    private var weatherResponse: WeatherResponse? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentTodayBinding.bind(view)
@@ -39,10 +45,15 @@ class TodayFragment : Fragment(R.layout.fragment_today) {
         (activity as WeatherActivity).setSupportActionBar(binding.toolbar)
         (activity as WeatherActivity).supportActionBar!!.setDisplayShowTitleEnabled(false)
 
-        viewModel.getCurrentWeather("New York")
+        sharedPreferences = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        val defaultValue = resources.getString(R.string.pref_city)
+        val city = sharedPreferences.getString(PREF_CITY, defaultValue)
+
+        viewModel.getCurrentWeather(city = city ?: "Kiev")
 
         viewModel.weatherResponse.observe(viewLifecycleOwner, Observer {
             updateUI(it)
+            weatherResponse = it.data
         })
     }
 
@@ -57,15 +68,21 @@ class TodayFragment : Fragment(R.layout.fragment_today) {
                 hideProgress()
                 if (weatherResponse.data != null) {
                     binding.tvCityName.text = weatherResponse.data.name
-                    binding.tvDegree.text = weatherResponse.data.main.temp.toString()
+                    binding.tvDegree.text = weatherResponse.data.main.temp.toInt().toString()
                     binding.tvWet.text = weatherResponse.data.main.humidity.toString() + "%"
                     binding.tvClouds.text = weatherResponse.data.clouds.all.toString() + "%"
                     binding.tvWindSpeed.text =
                         getString(R.string.speed, weatherResponse.data.wind.speed.toString())
                     binding.tvMaxTemp.text =
-                        getString(R.string.celsius, weatherResponse.data.main.temp_max.toString())
+                        getString(
+                            R.string.celsius,
+                            weatherResponse.data.main.temp_max.toInt().toString()
+                        )
                     binding.tvMinTemp.text =
-                        getString(R.string.celsius, weatherResponse.data.main.temp_min.toString())
+                        getString(
+                            R.string.celsius,
+                            weatherResponse.data.main.temp_min.toInt().toString()
+                        )
                     binding.tvToolbarTitle.text = weatherResponse.data.name
                 }
             }
@@ -107,6 +124,12 @@ class TodayFragment : Fragment(R.layout.fragment_today) {
 
             private fun callSearch(query: String) {
                 viewModel.getCurrentWeather(query)
+                sharedPreferences = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+                with(sharedPreferences.edit()) {
+                    putString(PREF_CITY, query)
+                        .apply()
+                }
+
             }
         })
     }
@@ -120,7 +143,7 @@ class TodayFragment : Fragment(R.layout.fragment_today) {
 
         val closeButton = searchView.findViewById<ImageView>(R.id.search_close_btn)
         closeButton.setImageResource(R.drawable.ic_close)
-        
+
         val searchBar = searchView.findViewById(R.id.search_bar) as LinearLayout
         searchBar.layoutTransition = LayoutTransition()
     }

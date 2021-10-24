@@ -1,7 +1,7 @@
 package com.scientisthamsterssofiandjohn.weatherapp.view.ui.fragments.week.adapter
 
-import com.scientisthamsterssofiandjohn.weatherapp.domain.model.ForecastResponse
+import com.scientisthamsterssofiandjohn.weatherapp.domain.model.ListItem
 
 interface weatherInteractionListener {
-    fun onMovieClick(weatherResponse: ForecastResponse, position: Int)
+    fun onMovieClick(weatherResponse: ListItem, position: Int)
 }
