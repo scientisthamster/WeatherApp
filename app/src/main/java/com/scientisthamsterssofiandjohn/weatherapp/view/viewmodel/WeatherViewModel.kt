@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.scientisthamsterssofiandjohn.weatherapp.data.Resource
 import com.scientisthamsterssofiandjohn.weatherapp.domain.model.ForecastResponse
 import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResponse
+import com.scientisthamsterssofiandjohn.weatherapp.domain.model.WeatherResult
 import com.scientisthamsterssofiandjohn.weatherapp.domain.repository.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -27,6 +28,11 @@ class WeatherViewModel @Inject constructor(
 
     val forecastResponse: LiveData<Resource<ForecastResponse>>
         get() = _forecastResponse
+
+    private val _savedWeather: MutableLiveData<List<WeatherResult>> = MutableLiveData()
+
+    val savedWeather: LiveData<List<WeatherResult>>
+        get() = _savedWeather
 
     fun getCurrentWeather(city: String) = viewModelScope.launch {
         _weatherResponse.postValue(Resource.Loading())
